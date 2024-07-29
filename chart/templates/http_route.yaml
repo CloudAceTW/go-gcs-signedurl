@@ -1,0 +1,27 @@
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: {{ include "chart.fullname" . }}-http-route
+  namespace: {{ .Release.Namespace }}
+  {{- with .Values.httpRoute.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: {{ .Values.httpRoute.gatewayName }}
+    namespace: {{ .Release.Namespace }}
+  {{- with .Values.httpRoute.hostnames }}
+  hostnames:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api/v1
+    backendRefs:
+    - name:  {{ include "chart.fullname" . }}
+      namespace: {{ .Release.Namespace }}
+      port: {{ .Values.service.port }}

@@ -1,0 +1,37 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: cloud-ace-signurl
+deploy:
+  helm:
+    releases:
+      - name: cloud-ace-signurl
+        namespace: cloud-ace-demo
+        createNamespace: false
+        chartPath: chart
+        valuesFiles:
+          - values.yaml
+        version: 0.1.0
+        setValueTemplates:
+          image.repository: "{{.IMAGE_REPO_go_gcs_signurl}}"
+          image.tag: "{{.IMAGE_TAG_go_gcs_signurl}}@{{.IMAGE_DIGEST_go_gcs_signurl}}"
+        skipTests: true
+profiles:
+  - name: ci
+    build:
+      local:
+        useBuildkit: true
+      artifacts:
+      - image: go-gcs-signurl
+        docker:
+          dockerfile: Dockerfile
+          cacheFrom: ["golang:1.22-bookworm", "debian:bookworm-slim"]
+  - name: dev
+    build:
+      googleCloudBuild: {}
+      artifacts:
+      - image: go-gcs-signurl
+        kaniko:
+          cache: {}
+  - name: prod
+  - name: staging

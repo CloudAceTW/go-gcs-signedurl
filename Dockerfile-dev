@@ -1,0 +1,9 @@
+FROM golang:1.22-alpine
+
+WORKDIR /opt/app/
+RUN cd /opt/app/
+
+COPY go.* ./
+RUN go mod download
+
+ENTRYPOINT ["sh", "-c"]
