@@ -1,0 +1,96 @@
+# Default values for chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+image:
+  repository: go-gcs-signurl
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: 1.0.0
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podServiceAccountAnnotations:
+  iam.gke.io/gcp-service-account: <SERVICE_ACCOUNT>@<PROJECT_ID>.iam.gserviceaccount.com
+
+podSecurityContext:
+  runAsUser: 1001
+  runAsGroup: 2002
+  fsGroup: 3003
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  annotations:
+    cloud.google.com/neg: '{"exposed_ports": {"80":{}}}'
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+  protocol: TCP
+
+httpRoute:
+  labels: {}
+  hostnames:
+  - <DOMAIN>  # "example.cloud-ace.com"
+  gatewayName: gcs-signurl-demo-gateway
+
+gateway:
+  enabled: false
+  labels: {}
+  gcpCertName: <CERT_NAME>
+  ipName: <IP_NAME>
+
+otel:
+  enabled: false
+  collector:
+    endpoint: http://otel:4317
+
+gcsBucket:
+  name: <GCE_BUCKET_NAME>
+
+firestore:
+  projectId: <PROJECT_ID>
+  database: <DATABASE>
+  collection: <COLLECTION>
+
+redis:
+  inClusterEnabled: true
+  host: redis-master
+  port: 6379
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

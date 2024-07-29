@@ -1,0 +1,18 @@
+{{- if .Values.redis.inClusterEnabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-redis
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/service_type: redis-database
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  ports:
+  - name: redis-port
+    port: {{ .Values.redis.port }}
+  clusterIP: None
+  selector:
+    {{- include "chart.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/service_type: redis-database
+{{- end }}
